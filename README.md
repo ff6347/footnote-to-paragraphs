@@ -9,5 +9,4 @@ Extract all footnotes of an ID Book into a new file
 3. the result will be created in a new document.
 
 @Todo:
-- remove Footnotes from original.
-- 
+- remove Footnotes from original.  
