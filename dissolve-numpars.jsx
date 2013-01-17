@@ -26,18 +26,18 @@ if(app.documents.length < 1) {
         alert("you need at least one document");
         return;
     }
-    var parStyles = app.activeDocument.characterStyles;
-    var foundStyle = false;
-    for(var p = 0; p < parStyles.length; p++){
-        if(parStyles[p].name == 'ScriptNumber'){
-            foundStyle = true;
-        }
-    }
+    // var parStyles = app.activeDocument.characterStyles;
+    // var foundStyle = false;
+    // for(var p = 0; p < parStyles.length; p++){
+    //     if(parStyles[p].name == 'ScriptNumber'){
+    //         foundStyle = true;
+    //     }
+    // }
 
-    if(foundStyle === false){
-        alert('You need a character style called "ScriptNumber" or the script cant continue.\n not "scriptnumber" or "Script Number". It has to be"ScriptNumber"');
-        return;
-    }
+    // if(foundStyle === false){
+    //     alert('You need a character style called "ScriptNumber" or the script cant continue.\n not "scriptnumber" or "Script Number". It has to be"ScriptNumber"');
+    //     return;
+    // }
     if((app.selection.length < 1)||(app.selection.length > 1)){
         alert("Please select one textframe of your story");
         return;
