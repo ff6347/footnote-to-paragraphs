@@ -19,53 +19,63 @@
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // see also http://www.opensource.org/licenses/mit-license.php
 dissolve_numpars();
+
 function dissolve_numpars() {
 
 
-if(app.documents.length < 1) {
+    if(app.documents.length < 1) {
         alert("you need at least one document");
         return;
     }
-    // var parStyles = app.activeDocument.characterStyles;
-    // var foundStyle = false;
-    // for(var p = 0; p < parStyles.length; p++){
-    //     if(parStyles[p].name == 'ScriptNumber'){
-    //         foundStyle = true;
-    //     }
-    // }
-
-    // if(foundStyle === false){
-    //     alert('You need a character style called "ScriptNumber" or the script cant continue.\n not "scriptnumber" or "Script Number". It has to be"ScriptNumber"');
-    //     return;
-    // }
-    if((app.selection.length < 1)||(app.selection.length > 1)){
+    if((app.selection.length < 1) || (app.selection.length > 1)) {
         alert("Please select one textframe of your story");
         return;
     }
 
     var theSelectedObj = app.selection[0];
-    if(theSelectedObj.constructor !== TextFrame){
+    if(theSelectedObj.constructor !== TextFrame) {
         alert("Your selection is not a textframe");
-    }else{
+    } else {
         // alert("This is a TF");
         var selTfParentStory = theSelectedObj.parentStory;
-        if(selTfParentStory.constructor == Story){
+        if(selTfParentStory.constructor == Story) {
             // alert("This is a stroy");
             var storyPars = selTfParentStory.paragraphs;
-            for(var i = 1; i < storyPars.length;i++){
+            for(var i = storyPars.length -1; i >= 1; i--) {
 
                 var par = storyPars[i];
-                par.convertBulletsAndNumberingToText ();
-                // var bufNum = String(i);
-                // par.insertionPoints[0].contents = bufNum + ". ";
-                // for(var j = 0; j < (bufNum.length+1);j++){
-                //     par.characters[j].appliedCharacterStyle = 'ScriptNumber';
-                // }
-                // par.
-            }
+                par.convertBulletsAndNumberingToText();
+                grep_it(par);
+            } // end par loop
         }
 
-    }//close no TextFrame
-
+    } //close no TextFrame
 }
 
+function grep_it(obj) {
+    // empts the change to field!!!thats
+    app.findGrepPreferences = NothingEnum.nothing;
+    app.changeGrepPreferences = NothingEnum.nothing;
+    // ------------ Now set all options for find ------------
+    app.findChangeGrepOptions.includeFootnotes = false;
+    app.findChangeGrepOptions.includeHiddenLayers = false;
+    app.findChangeGrepOptions.includeLockedLayersForFind = false;
+    app.findChangeGrepOptions.includeLockedStoriesForFind = true;
+    app.findChangeGrepOptions.includeMasterPages = false;
+    var greps = [{
+        "findWhat": "\r",
+        "changeTo": " "
+    }, //     Find all double spaces and replace with single spaces.
+    {
+        "findWhat": "\n ",
+        "changeTo": " "
+    }];
+    for(var k = 0; k < greps.length; k++) {
+        app.findGrepPreferences.findWhat = greps[k].findWhat;
+        // this is like entering text in the change to
+        app.changeGrepPreferences.changeTo = greps[k].changeTo;
+        obj.changeGrep();
+        app.findGrepPreferences = NothingEnum.nothing; // now empty the find what field!!!thats important!!!
+        app.changeGrepPreferences = NothingEnum.nothing; // empts the change to field!!!thats important!!!
+    }
+}
