@@ -18,6 +18,20 @@
 // TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTIO
 // WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 // see also http://www.opensource.org/licenses/mit-license.php
+//
+var greps = [{
+    "findWhat": "\n",
+    "changeTo": " "
+}, {
+    "findWhat": "\t",
+    "changeTo": " "
+}, {
+    "findWhat": "\r",
+    "changeTo": "~/"
+} //     Find all double spaces and replace with single spaces.
+];
+
+
 dissolve_numpars();
 
 function dissolve_numpars() {
@@ -32,6 +46,12 @@ function dissolve_numpars() {
         return;
     }
 
+    var resConfirm = confirm("This will delete all crossreferences. Are you shure?", false);
+    if(resConfirm === false) {
+        return;
+    }
+app.activeDocument.paragraphDestinations.everyItem().remove();
+
     var theSelectedObj = app.selection[0];
     if(theSelectedObj.constructor !== TextFrame) {
         alert("Your selection is not a textframe");
@@ -41,18 +61,27 @@ function dissolve_numpars() {
         if(selTfParentStory.constructor == Story) {
             // alert("This is a stroy");
             var storyPars = selTfParentStory.paragraphs;
-            for(var i = storyPars.length -1; i >= 1; i--) {
 
+            for(var i = storyPars.length - 1; i >= 1; i--) {
                 var par = storyPars[i];
                 par.convertBulletsAndNumberingToText();
-                grep_it(par);
             } // end par loop
+
+            for(var k = 0; k < greps.length; k++) {
+                var grp = greps[k];
+                for(var j = storyPars.length - 1; j >= 1; j--) {
+                    var par_to_grep = storyPars[j];
+                    grep_it(par_to_grep, grp.findWhat, grp.changeTo);
+                    grep_it(par_to_grep, grp.findWhat, grp.changeTo);
+                    grep_it(par_to_grep, grp.findWhat, grp.changeTo);
+                } // end par loop
+            }
         }
 
     } //close no TextFrame
 }
 
-function grep_it(obj) {
+function grep_it(obj, findWhat, changeTo) {
     // empts the change to field!!!thats
     app.findGrepPreferences = NothingEnum.nothing;
     app.changeGrepPreferences = NothingEnum.nothing;
@@ -62,20 +91,10 @@ function grep_it(obj) {
     app.findChangeGrepOptions.includeLockedLayersForFind = false;
     app.findChangeGrepOptions.includeLockedStoriesForFind = true;
     app.findChangeGrepOptions.includeMasterPages = false;
-    var greps = [{
-        "findWhat": "\r",
-        "changeTo": " "
-    }, //     Find all double spaces and replace with single spaces.
-    {
-        "findWhat": "\n ",
-        "changeTo": " "
-    }];
-    for(var k = 0; k < greps.length; k++) {
-        app.findGrepPreferences.findWhat = greps[k].findWhat;
-        // this is like entering text in the change to
-        app.changeGrepPreferences.changeTo = greps[k].changeTo;
-        obj.changeGrep();
-        app.findGrepPreferences = NothingEnum.nothing; // now empty the find what field!!!thats important!!!
-        app.changeGrepPreferences = NothingEnum.nothing; // empts the change to field!!!thats important!!!
-    }
+    app.findGrepPreferences.findWhat = findWhat;
+    // this is like entering text in the change to
+    app.changeGrepPreferences.changeTo = changeTo;
+    obj.changeGrep();
+    app.findGrepPreferences = NothingEnum.nothing; // now empty the find what field!!!thats important!!!
+    app.changeGrepPreferences = NothingEnum.nothing; // empts the change to field!!!thats important!!!
 }
